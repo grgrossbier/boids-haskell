@@ -27,6 +27,7 @@ dependencies:
 - gloss
 - array
 - gloss-rendering 
+- linear
 
 library:
   source-dirs: src

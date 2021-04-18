@@ -9,7 +9,7 @@ import Rendering
 import Physics
 
 
-newEnviornment = Enviornment [simpleCircle, centerCircle ] [] centerOfMap
+newEnviornment = Enviornment [simpleCircle] [centerCircle] centerOfMap
 
 window = G.InWindow "Functional" (screenWidth, screenHeight) (100, 100)
 backgroundColor = G.makeColorI 0 0 0 255

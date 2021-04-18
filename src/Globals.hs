@@ -1,6 +1,7 @@
 module Globals where
 
 import Graphics.Gloss
+import Linear.V2
 
 
 ballColor :: Color
@@ -23,8 +24,11 @@ screenHeight = 480
 frameRate :: Int
 frameRate = 30
 
-kSpring :: Float
-kSpring = 5
+kSpring :: V2 Float -- Force / Pixel
+kSpring = V2 13 13
 
-centerOfMap :: (Float, Float)
-centerOfMap = (fromIntegral screenHeight / 2, fromIntegral screenWidth / 2)
+gravity :: V2 Float
+gravity = V2 0 (-1000)
+
+centerOfMap :: V2 Float
+centerOfMap = V2 (fromIntegral screenWidth / 2) (fromIntegral screenHeight / 2)

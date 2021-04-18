@@ -2,6 +2,7 @@ module Rendering where
 
 import qualified Graphics.Gloss as G
 import Data.Array
+import Linear.V2
 
 import Shapes
 import Globals
@@ -10,12 +11,12 @@ enviornmentAsRunningPicture :: Enviornment -> G.Picture
 enviornmentAsRunningPicture env =
     G.pictures  [ G.color ballColor $ circlesOfEnviornment env
                 , G.color wallColor wallPicture
-                --  , color obsticleColor $ obsticlesOfEnviornment env
+                , G.color obsticleColor $ obsticlesOfEnviornment env
                 --  , color triangleColor $ trianglesOfEnvironment env
                 ]
 
-snapPictureToPosition :: (Float, Float) -> G.Picture -> G.Picture
-snapPictureToPosition (y, x) = G.translate x y
+snapPictureToPosition :: V2 Float -> G.Picture -> G.Picture
+snapPictureToPosition (V2 x y) = G.translate x y
 
 circlesOfEnviornment :: Enviornment -> G.Picture 
 circlesOfEnviornment env = G.pictures $ map pictureCircle circles
@@ -37,7 +38,15 @@ wallPicture =
         , (1,1)
         ]
 
-obsticlesOfEnviornment = undefined 
+obsticlesOfEnviornment :: Enviornment -> G.Picture 
+obsticlesOfEnviornment env = G.pictures $ map pictureCircle circles
+  where
+    circles = filter isCircle $ eObsticles env
+    getRadii shape
+        | isCircle shape = (\(Circle r) -> r) (sGeometry shape)
+    pictureCircle shape = 
+        snapPictureToPosition (sPosition shape) . G.Circle $ getRadii shape
+
 trianglesOfEnvironment = undefined 
 
 gameAsPicture :: Enviornment  -> G.Picture

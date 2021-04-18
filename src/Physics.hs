@@ -5,6 +5,9 @@ import Numeric
 import Shapes
 import Globals
 import Rendering
+import Linear.V2
+import Linear.Metric
+import ProjectMath
 
 
 vectorFromAtoB :: (Float, Float) -> (Float, Float) -> (Float, Float)
@@ -13,19 +16,24 @@ vectorFromAtoB (x, y) (x', y') = (x'-x, y'-y)
 vectorMagnitude :: (Float, Float) -> Float
 vectorMagnitude (x, y) = (x**2 + y**2) ** (1/2)
 
-splitVectorIntoComponents :: Float -> (Float, Float) -> (Float, Float)
-splitVectorIntoComponents mag (nx, ny) = ( mag * cos angle , mag * sin angle )
-  where
-    angle = (pi/2) - atan2 nx ny
+-- splitVectorIntoComponents :: Float -> (Float, Float) -> (Float, Float)
+-- splitVectorIntoComponents mag (nx, ny) = ( mag * cos angle , mag * sin angle )
+--   where
+--     angle = (pi/2) - atan2 nx ny
 
-springPullOnShape :: (Float, Float) -> Shape -> Shape
-springPullOnShape sPos s = s { sAcceleration = forceVectors}
+setAccelerationToZero :: Shape -> Shape
+setAccelerationToZero shape = shape { sAcceleration = V2 0 0 }
+
+applySpringForce :: V2 Float -> Shape -> V2 Float
+applySpringForce sPos s = dxy * kSpring
   where
     pos = sPosition s
-    toCenter = vectorFromAtoB pos sPos
-    dist = vectorMagnitude toCenter 
-    force = kSpring * dist
-    forceVectors = splitVectorIntoComponents force toCenter
+    toCenter = sPos - pos
+    nCenter = normalize toCenter
+    dxy = toCenter - scale 100 nCenter 
+
+applyGravity :: Shape -> V2 Float
+applyGravity s = gravity 
 
 advanceTime :: Float -> Enviornment -> Enviornment 
 advanceTime dt env = reactToObsticles
@@ -38,8 +46,18 @@ applyForceToShapes :: Enviornment -> Enviornment
 applyForceToShapes env = env { eShapes = forcesApplied }
   where
     shapes = eShapes env
-    center = eCenter env
-    forcesApplied = map (springPullOnShape center) shapes
+    resetAccelerations = map setAccelerationToZero shapes
+    forcesApplied = map (applyForceToShape env) resetAccelerations
+
+applyForceToShape :: Enviornment -> Shape -> Shape
+applyForceToShape env shape = forcesApplied
+  where
+    forces = 
+        [ applySpringForce (eCenter env)
+        , applyGravity]
+        <*> [shape]
+    totalForce = sum forces
+    forcesApplied = shape { sAcceleration  = sAcceleration shape + totalForce }
 
 advanceAllShapes :: Float -> Enviornment -> Enviornment 
 advanceAllShapes dt env = env { eShapes = advancedShapes}
@@ -52,13 +70,11 @@ advanceShape dt shape = shape
     { sPosition = p2
     , sVelocity = v2 }
   where
-    (px1, py1) = sPosition shape
-    (vx1, vy1) = sVelocity shape
-    (ax1, ay1) = sAcceleration shape
-    fr = fromIntegral frameRate
-    v2@(vx2, vy2) = (vx1 + ax1*dt , vy1 + ay1*dt)
-    -- vAVG@(avx, avy) = ( (vx1+vx2)/2 , (vy1+vy2)/2 )
-    p2 = (px1 + vx2*dt , py1 + vy2*dt)
+    p1 = sPosition shape
+    v1 = sVelocity shape
+    a1 = sAcceleration shape
+    v2 = v1 + scale dt a1
+    p2 = p1 + scale dt v2
 
 reactToAllObsticles :: Float -> Enviornment -> Enviornment 
 reactToAllObsticles dt env = env

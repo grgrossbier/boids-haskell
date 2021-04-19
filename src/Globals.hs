@@ -25,10 +25,16 @@ frameRate :: Int
 frameRate = 30
 
 kSpring :: V2 Float -- Force / Pixel
-kSpring = V2 13 13
+kSpring = V2 3 3
 
 gravity :: V2 Float
-gravity = V2 0 (-1000)
+gravity = V2 0 (-100)
+
+bounceEff :: Float
+bounceEff = 0.98
+
+dragCoeff :: Float
+dragCoeff = 3 -- Force / v / Size
 
 centerOfMap :: V2 Float
 centerOfMap = V2 (fromIntegral screenWidth / 2) (fromIntegral screenHeight / 2)

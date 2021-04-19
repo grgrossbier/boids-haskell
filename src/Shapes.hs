@@ -26,7 +26,8 @@ data Shape = Shape
     , sColor    :: G.Color
     , sPosition :: V2 Float
     , sVelocity :: V2 Float
-    , sAcceleration :: V2 Float } deriving (Show, Eq)
+    , sAcceleration :: V2 Float 
+    , sLastPosition :: V2 Float} deriving (Show, Eq)
 
 rotateShape shape angle = shape { sAngle = sAngle shape + angle }
 
@@ -42,22 +43,26 @@ isTriangle :: Shape -> Bool
 isTriangle s = case sGeometry s of  Triangle {} -> True
                                     _ -> False   
 
-
-
 simpleCircle :: Shape
 simpleCircle = Shape 
     { sGeometry = Circle 25
     , sAngle    = 0
     , sColor    = ballColor
-    , sPosition = V2 50 50
-    , sVelocity = V2 (-1) 0
-    , sAcceleration = V2 0 0 }
+    , sPosition = centerOfMap
+    , sVelocity = V2 (-70) 0
+    , sAcceleration = V2 0 0 
+    , sLastPosition = centerOfMap}
+
+testShape :: Shape
+testShape = simpleCircle { sPosition = V2 0 0
+                         , sVelocity = V2 1 1 }
 
 centerCircle :: Shape
 centerCircle = Shape 
-    { sGeometry = Circle 10
+    { sGeometry = Circle 6
     , sAngle    = 0
-    , sColor    = ballColor
+    , sColor    = obsticleColor 
     , sPosition = centerOfMap
     , sVelocity = V2 0 0
-    , sAcceleration = V2 0 0 }
+    , sAcceleration = V2 0 0 
+    , sLastPosition = centerOfMap}

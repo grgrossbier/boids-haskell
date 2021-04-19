@@ -8,6 +8,8 @@ import Globals
 import Rendering
 import Physics
 import Linear.V2
+import System.Random
+import Game
 
 
 newEnviornment = 
@@ -16,21 +18,26 @@ newEnviornment =
     , centerCircle {sVelocity = V2 50 0}] 
     [centerCircle] 
     centerOfMap
+    (mkStdGen 10)
 
 window = G.InWindow "Functional" (screenWidth, screenHeight) (100, 100)
 backgroundColor = G.makeColorI 0 0 0 255
 
 playWithGraphics :: IO ()
-playWithGraphics = 
+playWithGraphics = do
+    randGen <- randomIO :: IO Int
     G.play 
         window 
         backgroundColor 
         frameRate
-        newEnviornment 
+        newEnviornment { eStdGen = mkStdGen randGen }
         gameAsPicture 
         transformGame 
         advanceTime
 
-transformGame :: Event -> p -> p
-transformGame (EventKey (MouseButton LeftButton) Up _ mousePos) env = env
+transformGame :: Event -> Enviornment -> Enviornment 
+transformGame (EventKey (MouseButton LeftButton) Down _ (mx, my)) env = 
+    addShape ((V2 mx my) + globalOffset) env
+transformGame (EventKey (MouseButton RightButton) Down _ (mx, my)) env = 
+    addObsticle ((V2 mx my) + globalOffset) env
 transformGame _ env = env

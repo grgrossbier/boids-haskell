@@ -28,7 +28,7 @@ kSpring :: V2 Float -- Force / Pixel
 kSpring = V2 3 3
 
 gravity :: V2 Float
-gravity = V2 0 (-100)
+gravity = V2 0 (-400)
 
 bounceEff :: Float
 bounceEff = 0.98
@@ -38,3 +38,6 @@ dragCoeff = 0.005 -- Force / v / Size
 
 centerOfMap :: V2 Float
 centerOfMap = V2 (fromIntegral screenWidth / 2) (fromIntegral screenHeight / 2)
+
+globalOffset :: (Floating a, Num a) => V2 a
+globalOffset = V2 (fromIntegral screenWidth / 2) (fromIntegral screenHeight / 2)

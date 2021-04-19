@@ -2,6 +2,7 @@ module Shapes where
 
 import qualified Graphics.Gloss as G
 import Linear.V2
+import System.Random
 
 import Globals
 
@@ -14,7 +15,8 @@ data Enviornment = Enviornment
     { eShapes :: [Shape]
     , eObsticles :: [Shape]
     , eCenter :: V2 Float
-    } deriving (Eq, Show)
+    , eStdGen :: StdGen
+    } deriving (Show)
 
 
 data Geometry = Circle Radius | Rectangle Side Side | Triangle Height Base

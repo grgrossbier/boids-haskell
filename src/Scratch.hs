@@ -7,6 +7,7 @@ import ProjectMath
 import Rendering
 import Shapes
 import Player
+import Game
 
 sp1 :: V2 Float
 sp1 = V2 10 1

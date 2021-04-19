@@ -57,6 +57,7 @@ applyForceToShape env shape = forcesApplied
         [ const $ V2 0 0
         -- , applySpringForce (eCenter env)
         , applyGravity
+        , applyDrag
         ]
         <*> [shape]
     totalForce = sum forces
@@ -146,3 +147,11 @@ isWas dt s = (sPosition s, sLastPosition s)
 --     backStep = scale dt (sVelocity s)
 --     was = sPosition s - backStep
     
+applyDrag :: Shape -> V2 Float
+applyDrag shape = scale (dragCoeff * norm v * a) (negate $ normalize v)
+  where
+    v = sVelocity shape
+    a = case sGeometry shape of
+        Circle r -> r
+        Rectangle s1 s2 -> max s1 s2
+        Triangle h b -> b

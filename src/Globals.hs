@@ -34,7 +34,7 @@ bounceEff :: Float
 bounceEff = 0.98
 
 dragCoeff :: Float
-dragCoeff = 3 -- Force / v / Size
+dragCoeff = 0.005 -- Force / v / Size
 
 centerOfMap :: V2 Float
 centerOfMap = V2 (fromIntegral screenWidth / 2) (fromIntegral screenHeight / 2)

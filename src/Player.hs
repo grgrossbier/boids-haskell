@@ -14,9 +14,8 @@ import Game
 
 newEnviornment = 
     Enviornment 
-    [ simpleCircle
-    , centerCircle {sVelocity = V2 50 0}] 
-    [centerCircle] 
+    [ simpleCircle] 
+    [ simpleTriangle] 
     centerOfMap
     (mkStdGen 10)
 

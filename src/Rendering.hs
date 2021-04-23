@@ -6,27 +6,64 @@ import Linear.V2
 
 import Shapes
 import Globals
+import ProjectMath
 
 enviornmentAsRunningPicture :: Enviornment -> G.Picture
 enviornmentAsRunningPicture env =
-    G.pictures  [ G.color ballColor $ circlesOfEnviornment env
+    G.pictures  [ drawShapes env
                 , G.color wallColor wallPicture
                 , G.color obsticleColor $ obsticlesOfEnviornment env
-                --  , color triangleColor $ trianglesOfEnvironment env
+                , G.color obsticleColor $ drawTriangles $ eObsticles env
                 ]
 
 snapPictureToPosition :: V2 Float -> G.Picture -> G.Picture
 snapPictureToPosition (V2 x y) = G.translate x y
 
-circlesOfEnviornment :: Enviornment -> G.Picture 
-circlesOfEnviornment env = G.pictures $ map pictureCircle circles
+drawShapes :: Enviornment -> G.Picture
+drawShapes env = 
+    G.pictures  [ G.color ballColor $ drawCircles $ eShapes env
+                , G.color triangleColor $ drawTriangles $ eShapes env
+                ]
+
+drawCircles :: [Shape] -> G.Picture 
+drawCircles shapes = G.pictures $ map pictureCircle circles
   where
-    circles = filter isCircle $ eShapes env
+    circles = filter isCircle shapes
     getRadii shape
         | isCircle shape = (\(Circle r) -> r) (sGeometry shape)
     pictureCircle shape = 
         snapPictureToPosition (sPosition shape) . G.Circle $ getRadii shape
-      
+
+drawTriangles :: [Shape] -> G.Picture 
+drawTriangles shapes = G.pictures $ map pictureCircle triangles
+  where
+    triangles = filter isTriangle shapes
+    getHeight shape
+        | isTriangle shape = (\(Triangle h _) -> h) (sGeometry shape)
+    getBase shape
+        | isTriangle shape = (\(Triangle _ b) -> b) (sGeometry shape)
+    getAngle = sAngle
+    getHeightBaseAngle s = (getHeight s, getBase s, getAngle s)
+    pictureCircle shape = 
+        snapPictureToPosition (sPosition shape)
+        $ uncurry3 drawTriangle (getHeightBaseAngle shape)
+
+uncurry3 :: (a -> b -> c -> d) -> (a, b, c) -> d
+uncurry3 f (a,b,c) = f a b c 
+
+drawTriangle :: Height -> Base -> Angle -> G.Picture
+drawTriangle h b ang = 
+    G.line
+        [ v2ToTuple $ rotateV2 p1 ang
+        , v2ToTuple $ rotateV2 p2 ang
+        , v2ToTuple $ rotateV2 p3 ang
+        , v2ToTuple $ rotateV2 p1 ang
+        ]
+  where
+    v2ToTuple (V2 x y) = (x,y)
+    p1 = V2 (-h/2) (b/2)
+    p2 = V2 (h/2) 0
+    p3 = V2 (-h/2) (-b/2)
 
 wallPicture :: G.Picture 
 wallPicture = 
@@ -46,8 +83,6 @@ obsticlesOfEnviornment env = G.pictures $ map pictureCircle circles
         | isCircle shape = (\(Circle r) -> r) (sGeometry shape)
     pictureCircle shape = 
         snapPictureToPosition (sPosition shape) . G.Circle $ getRadii shape
-
-trianglesOfEnvironment = undefined 
 
 gameAsPicture :: Enviornment  -> G.Picture
 gameAsPicture env = G.translate (fromIntegral screenWidth * (-0.5))

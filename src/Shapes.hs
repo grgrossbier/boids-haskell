@@ -68,3 +68,16 @@ centerCircle = Shape
     , sVelocity = V2 0 0
     , sAcceleration = V2 0 0 
     , sLastPosition = centerOfMap}
+
+simpleTriangle :: Shape
+simpleTriangle = Shape 
+    { sGeometry = Triangle 20 10
+    , sAngle    = pi/4
+    , sColor    = obsticleColor 
+    , sPosition = centerOfMap
+    , sVelocity = V2 0 0
+    , sAcceleration = V2 0 0 
+    , sLastPosition = centerOfMap}
+
+degToRadian :: Float -> Angle
+degToRadian deg = deg*pi/180

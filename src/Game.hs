@@ -29,3 +29,15 @@ addShape pos env = env
         { sPosition = pos
         , sAngle = newAngle}    
 
+addBird :: V2 Float -> Enviornment -> Enviornment 
+addBird (V2 x y) env = env
+    { eBirds = newBird : birds
+    , eStdGen = newGen'' }
+  where
+    birds = eBirds env
+    (newAngle, newGen) = randomR (-pi,pi) (eStdGen env)
+    (dx, newGen') = randomR ((-3.0),3.0) newGen
+    (dy, newGen'') = randomR ((-3.0),3.0) newGen'
+    newBird = simpleTriangle 
+        { sPosition = V2 (x+dx) (y+dy)
+        , sAngle = newAngle}

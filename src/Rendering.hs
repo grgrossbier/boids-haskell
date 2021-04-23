@@ -14,6 +14,7 @@ enviornmentAsRunningPicture env =
                 , G.color wallColor wallPicture
                 , G.color obsticleColor $ obsticlesOfEnviornment env
                 , G.color obsticleColor $ drawTriangles $ eObsticles env
+                , G.color triangleColor $ drawBirds $ eBirds env
                 ]
 
 snapPictureToPosition :: V2 Float -> G.Picture -> G.Picture
@@ -91,6 +92,9 @@ gameAsPicture env = G.translate (fromIntegral screenWidth * (-0.5))
     where frame = enviornmentAsRunningPicture env
                     -- GameOver winner -> boardAsGameOverPicture winner (gBoard game)
 
+drawBirds :: [Shape] -> G.Picture 
+drawBirds shapes = 
+    G.pictures [drawTriangles shapes, drawCircles shapes]
 
 -- snapPictureToCell :: (Integral a, Integral b) => Picture -> (a, b) -> Picture
 -- snapPictureToCell picture (row, column) = translate x y picture

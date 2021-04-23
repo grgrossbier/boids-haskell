@@ -1,6 +1,6 @@
 module Physics where
 
-import Numeric
+import Data.List
 
 import Shapes
 import Globals
@@ -39,9 +39,9 @@ advanceTime :: Float -> Enviornment -> Enviornment
 advanceTime dt env = reactToWalls
   where
     applyForces = applyForceToShapes env
-    advanceShapes = advanceAllShapes dt applyForces
+    applySteering = applySteeringToBirds applyForces
+    advanceShapes = advanceAll dt applySteering
     reactToWalls = reactToAllWalls dt bounceEff advanceShapes
-
 
 applyForceToShapes :: Enviornment -> Enviornment 
 applyForceToShapes env = env { eShapes = forcesApplied }
@@ -64,23 +64,41 @@ applyForceToShape env shape = forcesApplied
     forcesApplied = 
         shape { sAcceleration  = sAcceleration shape + totalForce }
 
-advanceAllShapes :: Float -> Enviornment -> Enviornment 
-advanceAllShapes dt env = env { eShapes = advancedShapes}
+advanceAll :: Float -> Enviornment -> Enviornment 
+advanceAll dt env = env { eShapes = advancedShapes
+                        , eBirds = advancedBirds}
   where
     shapes = eShapes env
     advancedShapes = map (advanceShape dt) shapes
+    birds = eBirds env
+    advancedBirds = map (advanceBird dt) birds
 
 advanceShape :: Float -> Shape -> Shape
 advanceShape dt shape = shape 
-    { sPosition = p2
-    , sVelocity = v2
-    , sLastPosition = p1 }
+        { sPosition = p2
+        , sVelocity = v2
+        , sLastPosition = p1
+        , sAngle = if isTriangle shape then unangle v2 else sAngle shape
+        }
   where
     p1 = sPosition shape
     v1 = sVelocity shape
     a1 = sAcceleration shape
     v2 = v1 + scale dt a1
     p2 = p1 + scale dt v2
+
+advanceBird :: Float -> Shape -> Shape
+advanceBird dt shape = shape 
+        { sPosition = p2T
+        , sVelocity = v2T
+        , sLastPosition = p1
+        }
+  where
+    p1 = sPosition shape
+    v1 = sVelocity shape
+    ang = sAngle shape
+    v2T = rotateV2 (V2 (norm v1) 0) ang
+    p2T = p1 + scale dt v2T
 
 reactToAllWalls :: Float -> Float -> Enviornment -> Enviornment 
 reactToAllWalls dt eff env = env { eShapes = bounceB} 
@@ -143,9 +161,6 @@ doesCircleHitWall dt wallOrigin wallVector shape
     
 isWas :: Float -> Shape -> (V2 Float , V2 Float)
 isWas dt s = (sPosition s, sLastPosition s)
---   where
---     backStep = scale dt (sVelocity s)
---     was = sPosition s - backStep
     
 applyDrag :: Shape -> V2 Float
 applyDrag shape = scale (dragCoeff * norm v * a) (negate $ normalize v)
@@ -155,3 +170,61 @@ applyDrag shape = scale (dragCoeff * norm v * a) (negate $ normalize v)
         Circle r -> r
         Rectangle s1 s2 -> max s1 s2
         Triangle h b -> b
+
+applySteeringToBirds :: Enviornment -> Enviornment 
+applySteeringToBirds env = env { eBirds = appliedAvoidance }
+  where
+    birds = eBirds env
+    kSep = eKSeparation env
+    kAlign = eKAlignment env
+    kCoh = eKCohesion env
+    kAvoid = eKAvoidance env
+    appliedSeperation = applyToEachInFlock (maxDist/2) (applySeperation kSep) birds
+    appliedAlignment = applyToEachInFlock maxDist (applyAlignment kAlign) appliedSeperation
+    appliedCohesion = applyToEachInFlock maxDist (applySeperation (-kCoh)) appliedAlignment
+    appliedAvoidance = map (applyAvoidance (maxDist/2) kAvoid env) appliedCohesion
+
+applySeperation :: Float -> [Shape] -> Shape -> Shape
+applySeperation k others target = target { sAngle = oldAngle + turn }
+  where
+    pushVectors = map (getPushVector target) others
+    compositeVector = sum pushVectors
+    oldAngle = sAngle target
+    turn = (unangle compositeVector - oldAngle) / (100*k)
+    
+
+applyAlignment :: Float -> [Shape] -> Shape -> Shape
+applyAlignment k others target = target { sAngle = oldAngle + turn }
+  where
+    avgAlignment = sum $ map sAngle others
+    oldAngle = sAngle target
+    turn = (avgAlignment - oldAngle) / (100*k)
+
+applyAvoidance :: Float -> Float -> Enviornment -> Shape -> Shape
+applyAvoidance thresh k env target = target { sAngle = oldAngle + turn }
+  where
+    allObst = eShapes env ++ eObsticles env
+    pushVectors = 
+        map (getPushVector target) 
+        . filter (isCloseEnough thresh target) 
+        $ allObst
+    compositeVector = sum pushVectors
+    oldAngle = sAngle target
+    turn = (unangle compositeVector - oldAngle) / (100*k)
+
+applyToEachInFlock :: Float -> ([Shape] -> Shape -> Shape) -> [Shape] -> [Shape]
+applyToEachInFlock thresh f flock = appliedToAll
+  where
+    theseAreCloseEnough set bird = filter (isCloseEnough thresh bird) set
+    applyToOneOfGroup set bird = f (theseAreCloseEnough set bird \\ [bird]) bird
+    appliedToAll = map (applyToOneOfGroup flock) flock
+
+isCloseEnough :: Float -> Shape -> Shape -> Bool
+isCloseEnough thresh bird1 bird2 = 
+    distance (sPosition bird1) (sPosition bird2) < thresh
+
+
+getPushVector :: Shape -> Shape -> V2 Float
+getPushVector sTarget s = if sPosition sTarget == sPosition s
+                            then V2 1 0
+                            else normalize $ sPosition sTarget - sPosition s

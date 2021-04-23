@@ -41,3 +41,6 @@ centerOfMap = V2 (fromIntegral screenWidth / 2) (fromIntegral screenHeight / 2)
 
 globalOffset :: (Floating a, Num a) => V2 a
 globalOffset = V2 (fromIntegral screenWidth / 2) (fromIntegral screenHeight / 2)
+
+maxDist :: (Floating a, Num a) => a
+maxDist = 50

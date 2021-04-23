@@ -25,6 +25,7 @@ rotateV2 v a = rotated
     rotationMatrix = V2 (V2 ca (-sa)) (V2 sa ca)
     (V1 rotated) = V1 v !*! (transpose rotationMatrix)
 
+
 -- https://cs.stackexchange.com/questions/127295/algorithm-for-intersection-point-between-two-vectors
 -- intersectionOfLines
 --     d1 = cross(p - a, b - a)

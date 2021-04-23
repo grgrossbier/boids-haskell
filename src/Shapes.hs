@@ -12,10 +12,15 @@ type Height = Float
 type Base = Float
 type Side = Float
 data Enviornment = Enviornment
-    { eShapes :: [Shape]
+    { eBirds :: [Shape]
+    , eShapes :: [Shape]
     , eObsticles :: [Shape]
     , eCenter :: V2 Float
     , eStdGen :: StdGen
+    , eKSeparation :: Float
+    , eKAlignment :: Float
+    , eKCohesion :: Float
+    , eKAvoidance :: Float
     } deriving (Show)
 
 
@@ -75,7 +80,7 @@ simpleTriangle = Shape
     , sAngle    = pi/4
     , sColor    = obsticleColor 
     , sPosition = centerOfMap
-    , sVelocity = V2 0 0
+    , sVelocity = V2 50 0
     , sAcceleration = V2 0 0 
     , sLastPosition = centerOfMap}
 

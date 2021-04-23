@@ -23,9 +23,11 @@ Add ball on click
  - Add Triangles 
 
 ## Step 5: 
- - Click for ball obsticle
- - Click for triangle shape
- - Move triangles (update angle according to velocity)
+ - Click for ball obsticle !
+ - Click for triangle shape !
+ - Move triangles (update angle according to velocity) !
 
 ## Step 6: 
  - Shapes are repelled from obsticles.
+ - Something isn't working. 
+    After applySteering do they disappear? Am I losing data/birds

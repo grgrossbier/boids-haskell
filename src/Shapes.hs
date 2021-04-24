@@ -24,7 +24,10 @@ data Enviornment = Enviornment
     } deriving (Show)
 
 
-data Geometry = Circle Radius | Rectangle Side Side | Triangle Height Base
+data Geometry = 
+    Circle { getRadius :: Radius } 
+    | Rectangle { getSide1 :: Side, getSide2 :: Side }
+    | Triangle { getHeight :: Height, getBase :: Base }
     deriving (Eq, Show)
 
 data Shape = Shape  
@@ -49,6 +52,12 @@ isRectangle s = case sGeometry s of Rectangle {} -> True
 isTriangle :: Shape -> Bool
 isTriangle s = case sGeometry s of  Triangle {} -> True
                                     _ -> False   
+
+effectiveRadius :: Shape -> Float
+effectiveRadius s
+    | isCircle s = getRadius . sGeometry $ s
+    | isTriangle s = max ((getHeight . sGeometry) s) ((getBase . sGeometry) s)/2
+    | isRectangle s = max ((getSide1 . sGeometry) s) ((getSide2 . sGeometry) s)/1.7
 
 simpleCircle :: Shape
 simpleCircle = Shape 

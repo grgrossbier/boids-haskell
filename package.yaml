@@ -28,6 +28,7 @@ dependencies:
 - array
 - gloss-rendering 
 - linear
+- pretty-simple
 
 library:
   source-dirs: src

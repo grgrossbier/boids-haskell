@@ -1,5 +1,7 @@
 module ProjectMath where
 
+import Shapes 
+
 import Linear.V2
 import Linear.V1
 import Linear.Metric
@@ -25,6 +27,11 @@ rotateV2 v a = rotated
     rotationMatrix = V2 (V2 ca (-sa)) (V2 sa ca)
     (V1 rotated) = V1 v !*! (transpose rotationMatrix)
 
+limitAngle :: Angle -> Angle
+limitAngle angle
+    | angle < 0     = until (>0) (+(2*pi)) angle
+    | angle >= 2*pi = until (<2*pi) (+(-2*pi)) angle
+    | otherwise     = angle
 
 -- https://cs.stackexchange.com/questions/127295/algorithm-for-intersection-point-between-two-vectors
 -- intersectionOfLines

@@ -35,7 +35,7 @@ addBird (V2 x y) env = env
     , eStdGen = newGen'' }
   where
     birds = eBirds env
-    (newAngle, newGen) = randomR (-pi,pi) (eStdGen env)
+    (newAngle, newGen) = randomR (0,2*pi) (eStdGen env)
     (dx, newGen') = randomR ((-3.0),3.0) newGen
     (dy, newGen'') = randomR ((-3.0),3.0) newGen'
     newBird = simpleTriangle 

@@ -172,7 +172,7 @@ applyDrag shape = scale (dragCoeff * norm v * a) (negate $ normalize v)
         Triangle h b -> b
 
 applySteeringToBirds :: Enviornment -> Enviornment 
-applySteeringToBirds env = env { eBirds = appliedAvoidance }
+applySteeringToBirds env = env { eBirds = appliedCohesion }
   where
     birds = eBirds env
     kSep = eKSeparation env
@@ -182,26 +182,32 @@ applySteeringToBirds env = env { eBirds = appliedAvoidance }
     appliedSeperation = applyToEachInFlock (maxDist/2) (applySeperation kSep) birds
     appliedAlignment = applyToEachInFlock maxDist (applyAlignment kAlign) appliedSeperation
     appliedCohesion = applyToEachInFlock maxDist (applySeperation (-kCoh)) appliedAlignment
-    appliedAvoidance = map (applyAvoidance (maxDist/2) kAvoid env) appliedCohesion
+    -- appliedAvoidance = map (applyAvoidance (maxDist/2) kAvoid env) appliedCohesion
 
 applySeperation :: Float -> [Shape] -> Shape -> Shape
-applySeperation k others target = target { sAngle = oldAngle + turn }
+applySeperation k others target
+    | null others = target
+    | otherwise = target { sAngle = limitAngle $ oldAngle + turn }
   where
     pushVectors = map (getPushVector target) others
     compositeVector = sum pushVectors
     oldAngle = sAngle target
-    turn = (unangle compositeVector - oldAngle) / (100*k)
+    turn = ((limitAngle . unangle) compositeVector - oldAngle) / (10*k)
     
 
 applyAlignment :: Float -> [Shape] -> Shape -> Shape
-applyAlignment k others target = target { sAngle = oldAngle + turn }
+applyAlignment k others target
+    | null others = target
+    | otherwise = target { sAngle = limitAngle $ oldAngle + turn }
   where
-    avgAlignment = sum $ map sAngle others
+    avgAlignment = sum $ map (limitAngle . sAngle) others
     oldAngle = sAngle target
-    turn = (avgAlignment - oldAngle) / (100*k)
+    turn = min (-0.1) $ max 0.1 $ (avgAlignment - oldAngle) / (10*k)
 
 applyAvoidance :: Float -> Float -> Enviornment -> Shape -> Shape
-applyAvoidance thresh k env target = target { sAngle = oldAngle + turn }
+applyAvoidance thresh k env target
+    | null allObst = target
+    | otherwise = target { sAngle = limitAngle $ oldAngle + turn }
   where
     allObst = eShapes env ++ eObsticles env
     pushVectors = 
@@ -210,7 +216,7 @@ applyAvoidance thresh k env target = target { sAngle = oldAngle + turn }
         $ allObst
     compositeVector = sum pushVectors
     oldAngle = sAngle target
-    turn = (unangle compositeVector - oldAngle) / (100*k)
+    turn = ((limitAngle . unangle) compositeVector - oldAngle) / (10*k)
 
 applyToEachInFlock :: Float -> ([Shape] -> Shape -> Shape) -> [Shape] -> [Shape]
 applyToEachInFlock thresh f flock = appliedToAll

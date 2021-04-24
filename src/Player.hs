@@ -15,11 +15,11 @@ import Game
 newEnviornment = 
     Enviornment 
     [ simpleTriangle]
-    [ simpleCircle] 
-    [ simpleCircle] 
+    [ ] 
+    [ ] 
     centerOfMap
     (mkStdGen 10)
-    10 10 10 10
+    10 5 50 10
 
 window = G.InWindow "Functional" (screenWidth, screenHeight) (100, 100)
 backgroundColor = G.makeColorI 0 0 0 255

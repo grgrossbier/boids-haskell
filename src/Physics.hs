@@ -191,8 +191,9 @@ applySeperation k others target
     | otherwise = target { sAngle = limitAngle newAngle } --limitAngle $ oldAngle + turn }
   where
     pushVectors = map (getPushVector target) others
+    scaledByProx = map scaleByProximity pushVectors
     numOthers = fromIntegral $ length others
-    compositeVector = sum pushVectors * (V2 (k/100) (k/100)) / numOthers
+    compositeVector = scale (k/100/numOthers) $ sum scaledByProx
     oldAngleVector = angle $ sAngle target
     newAngle = unangle $ oldAngleVector + compositeVector
     -- compositeVector = sum pushVectors / numOthers
@@ -206,9 +207,11 @@ applyCohesion k others target
     | others == [target] = target
     | otherwise = target { sAngle = limitAngle newAngle }
   where
-    pullVectors = map (`getPushVector` target) others
+    pullVectors = map (flip (getPushVector) target) others
     numOthers = fromIntegral $ length others
-    compositeVector = sum pullVectors * (V2 (k/100) (k/100))
+    cohLimit = if numOthers <= 5 then 1 else 5/numOthers
+    normalizedPulls = map normalize pullVectors
+    compositeVector = scale (k/100*cohLimit) $ sum normalizedPulls
     oldAngleVector = angle $ sAngle target
     newAngle = unangle $ oldAngleVector + compositeVector
     -- turn = simpleLimit $ 
@@ -222,9 +225,14 @@ applyAlignment k others target
     | otherwise = target { sAngle = limitAngle $ oldAngle + turn }
   where
     numOthers = fromIntegral $ length others
-    avgAlignment = (sum $ map (limitAngle . sAngle) others) / numOthers
+    avgAlignment = sum (map (angle . sAngle) others) / numOthers
     oldAngle = sAngle target
-    turn = limitTurn 0.1 (-0.1) $ (k*avgAlignment - oldAngle) / (10*(k+1))
+    turn = 
+        limitTurn 0.1 (-0.1) 
+        $ (unangle  ((scale (k/10) avgAlignment) + angle oldAngle)) - oldAngle
+    -- avgAlignment = (sum $ map (limitAngle . sAngle) others) / numOthers
+    -- oldAngle = sAngle target
+    -- turn = limitTurn 0.1 (-0.1) $ (k*avgAlignment - oldAngle) / (10*(k+1))
 
 applyAvoidance :: Float -> Float -> Enviornment -> Shape -> Shape
 applyAvoidance thresh k env target
@@ -236,7 +244,8 @@ applyAvoidance thresh k env target
         map (getPushVector target) 
         . filter (obsticleIsCloseEnough thresh target) 
         $ allObst
-    compositeVector = sum pushVectors * (V2 (k/100) (k/100))
+    scaledByProx = map scaleByProximity pushVectors
+    compositeVector = sum scaledByProx * (V2 (k/100) (k/100))
     oldAngleVector = angle $ sAngle target
     newAngle = unangle $ oldAngleVector + compositeVector
     -- compositeVector = sum pushVectors
@@ -262,6 +271,13 @@ obsticleIsCloseEnough thresh bird ob =
 
 
 getPushVector :: Shape -> Shape -> V2 Float
-getPushVector sTarget s = if sPosition sTarget == sPosition s
-                            then V2 0 0
-                            else normalize $ sPosition sTarget - sPosition s
+getPushVector sTarget s
+    | sPosition sTarget == sPosition s = V2 0 0
+    | otherwise = vec
+  where
+    vec = sPosition sTarget - sPosition s
+    -- normalVec = normalize vec
+    -- eScale = 5 * exp (-(norm vec) / 10) + 1
+
+scaleByProximity :: V2 Float -> V2 Float
+scaleByProximity v = scale (5*(exp (-(norm v)/10))+1) (normalize v)

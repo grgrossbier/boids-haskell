@@ -4,6 +4,9 @@ import Shapes
 import Linear.V2
 import System.Random
 
+import Globals
+import ProjectMath
+
 addObsticle :: V2 Float -> Enviornment -> Enviornment 
 addObsticle pos env = env
     { eObsticles = newObst : obsts
@@ -49,7 +52,7 @@ killBirds :: Enviornment -> Enviornment
 killBirds env = env { eBirds = [] }
 
 removeObsticles :: Enviornment -> Enviornment
-removeObsticles env = env { eObsticles = [] }
+removeObsticles env = env { eObsticles = leftWall ++ rightWall ++ topWall ++ bottomWall }
 
 removeShapes :: Enviornment -> Enviornment
 removeShapes env = env { eShapes = [] }
@@ -65,3 +68,34 @@ scaleKAlign scale env = env { eKAlignment = eKAlignment env * scale}
 
 scaleKAvoid :: Float -> Enviornment -> Enviornment 
 scaleKAvoid scale env = env { eKAvoidance = eKAvoidance env * scale}
+
+
+-- Ball Border
+
+borderBall = simpleCircle { sGeometry = Shapes.Circle 12 }
+moveUp ball = ball { sPosition = sPosition ball + V2 0 30 }
+moveRight ball = ball { sPosition = sPosition ball + V2 30 0 }
+
+leftWall :: [Shape]
+leftWall = 
+    takeWhile (\b -> yOnly (sPosition b) < fromIntegral screenHeight)
+    $ iterate moveUp 
+    $ borderBall { sPosition = V2 15 30 }
+
+rightWall :: [Shape]
+rightWall = 
+    takeWhile (\b -> yOnly (sPosition b) < fromIntegral screenHeight)
+    $ iterate moveUp 
+    $ borderBall { sPosition = V2 (fromIntegral screenWidth - 15) 30 }
+
+bottomWall :: [Shape]
+bottomWall = 
+    takeWhile (\b -> xOnly (sPosition b) < (fromIntegral screenWidth - 30))
+    $ iterate moveRight 
+    $ borderBall { sPosition = V2 30 15 }
+
+topWall :: [Shape]
+topWall = 
+    takeWhile (\b -> xOnly (sPosition b) < (fromIntegral screenWidth - 30))
+    $ iterate moveRight 
+    $ borderBall { sPosition = V2 30 (fromIntegral screenHeight - 15) }

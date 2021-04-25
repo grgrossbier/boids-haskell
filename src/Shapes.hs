@@ -18,8 +18,8 @@ data Enviornment = Enviornment
     , eCenter :: V2 Float
     , eStdGen :: StdGen
     , eKSeparation :: Float
-    , eKAlignment :: Float
     , eKCohesion :: Float
+    , eKAlignment :: Float
     , eKAvoidance :: Float
     } deriving (Show)
 

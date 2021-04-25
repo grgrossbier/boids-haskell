@@ -16,10 +16,10 @@ failColor :: Color
 failColor = greyN 1.0
 
 screenWidth :: Int
-screenWidth = 640
+screenWidth = 940
 
 screenHeight :: Int
-screenHeight = 480
+screenHeight = 780
 
 frameRate :: Int
 frameRate = 30

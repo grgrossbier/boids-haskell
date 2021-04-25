@@ -20,7 +20,7 @@ newEnviornment =
     (leftWall ++ rightWall ++ topWall ++ bottomWall)
     centerOfMap
     (mkStdGen 10)
-    10 1 1 20
+    15 1 20 20
 
 window = G.InWindow "Functional" (screenWidth, screenHeight) (100, 100)
 backgroundColor = G.makeColorI 0 0 0 255
@@ -60,33 +60,3 @@ transformGame _ env = env
 
 
 ----------------------------
-
--- Ball Border
-
-borderBall = simpleCircle { sGeometry = Shapes.Circle 12 }
-moveUp ball = ball { sPosition = sPosition ball + V2 0 30 }
-moveRight ball = ball { sPosition = sPosition ball + V2 30 0 }
-
-leftWall :: [Shape]
-leftWall = 
-    takeWhile (\b -> yOnly (sPosition b) < fromIntegral screenHeight)
-    $ iterate moveUp 
-    $ borderBall { sPosition = V2 15 30 }
-
-rightWall :: [Shape]
-rightWall = 
-    takeWhile (\b -> yOnly (sPosition b) < fromIntegral screenHeight)
-    $ iterate moveUp 
-    $ borderBall { sPosition = V2 (fromIntegral screenWidth - 15) 30 }
-
-bottomWall :: [Shape]
-bottomWall = 
-    takeWhile (\b -> xOnly (sPosition b) < (fromIntegral screenWidth - 30))
-    $ iterate moveRight 
-    $ borderBall { sPosition = V2 30 15 }
-
-topWall :: [Shape]
-topWall = 
-    takeWhile (\b -> xOnly (sPosition b) < (fromIntegral screenWidth - 30))
-    $ iterate moveRight 
-    $ borderBall { sPosition = V2 30 (fromIntegral screenHeight - 15) }

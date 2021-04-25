@@ -33,6 +33,18 @@ limitAngle angle
     | angle >= 2*pi = until (<2*pi) (+(-2*pi)) angle
     | otherwise     = angle
 
+limitTurn :: Angle -> Angle -> Angle -> Angle
+limitTurn upper lower angle = limitToBounds
+  where
+    zeroTo2Pi = limitAngle angle
+    piToNegPi = if zeroTo2Pi > pi 
+                then zeroTo2Pi - 2*pi 
+                else zeroTo2Pi
+    limitToBounds = max lower $ min upper piToNegPi
+
+simpleLimit :: Angle -> Angle
+simpleLimit = limitTurn (pi/2) (-pi/2)
+
 -- https://cs.stackexchange.com/questions/127295/algorithm-for-intersection-point-between-two-vectors
 -- intersectionOfLines
 --     d1 = cross(p - a, b - a)

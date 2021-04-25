@@ -95,3 +95,22 @@ simpleTriangle = Shape
 
 degToRadian :: Float -> Angle
 degToRadian deg = deg*pi/180
+
+
+
+
+
+
+
+
+
+
+
+testBirds :: [Shape]
+testBirds = [bird1, bird2] --, bird3, bird4]
+
+bird1 = simpleTriangle { sAngle = 0, sPosition = V2 200 200 }
+bird2 = simpleTriangle { sAngle = degToRadian 10, sPosition = V2 205 200 }
+bird3 = simpleTriangle { sAngle = degToRadian 20, sPosition = V2 200 205 }
+bird4 = simpleTriangle { sAngle = degToRadian 30, sPosition = V2 205 205 }
+

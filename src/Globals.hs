@@ -13,7 +13,7 @@ obsticleColor   = makeColorI 50 100 255 255
 triangleColor :: Color
 triangleColor   = makeColorI 50 255 50 255
 failColor :: Color
-failColor = greyN 0.5
+failColor = greyN 1.0
 
 screenWidth :: Int
 screenWidth = 640
@@ -43,4 +43,4 @@ globalOffset :: (Floating a, Num a) => V2 a
 globalOffset = V2 (fromIntegral screenWidth / 2) (fromIntegral screenHeight / 2)
 
 maxDist :: (Floating a, Num a) => a
-maxDist = 50
+maxDist = 100

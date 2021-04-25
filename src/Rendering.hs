@@ -3,6 +3,7 @@ module Rendering where
 import qualified Graphics.Gloss as G
 import Data.Array
 import Linear.V2
+import Text.Printf
 
 import Shapes
 import Globals
@@ -15,7 +16,25 @@ enviornmentAsRunningPicture env =
                 , G.color obsticleColor $ obsticlesOfEnviornment env
                 , G.color obsticleColor $ drawTriangles $ eObsticles env
                 , G.color triangleColor $ drawBirds $ eBirds env
+                , G.color failColor $ printStats env
                 ]
+
+printStats :: Enviornment -> G.Picture 
+printStats env = G.pictures
+    [ snapPictureToPosition (V2 xstart 10) kSep
+    , snapPictureToPosition (V2 (xstart+1*xstep) 10) kCoh   
+    , snapPictureToPosition (V2 (xstart+2*xstep) 10) kAlign 
+    , snapPictureToPosition (V2 (xstart+3*xstep) 10) kAvoid
+    ]
+  where
+    scale = 0.1
+    xstart = 10
+    xstep = 100
+    kSep    = G.scale scale scale $ G.Text $ "kSep: " ++ kToString (eKSeparation env)
+    kCoh    = G.scale scale scale $ G.Text $ "kCoh: " ++ kToString (eKCohesion env)
+    kAlign  = G.scale scale scale $ G.Text $ "kAlign: " ++ kToString (eKAlignment env)
+    kAvoid  = G.scale scale scale $ G.Text $ "kAvoid: " ++ kToString (eKAvoidance env)
+    kToString k = printf "%.2f" k
 
 snapPictureToPosition :: V2 Float -> G.Picture -> G.Picture
 snapPictureToPosition (V2 x y) = G.translate x y

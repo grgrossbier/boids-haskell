@@ -20,14 +20,17 @@ addObsticle pos env = env
 
 addShape :: V2 Float -> Enviornment -> Enviornment 
 addShape pos env = env
-    { eShapes = newShape : shapes 
-    , eStdGen = newGen }
+    { eShapes = newShape : shapes
+    , eStdGen = newGen'' }
   where
     shapes = eShapes env
-    (newAngle, newGen) = randomR (-pi, pi) (eStdGen env)
-    newShape = simpleTriangle
+    (newRadius, newGen) = randomR (5,30) (eStdGen env)
+    (newVX, newGen') = randomR (-100,100) newGen
+    (newVY, newGen'') = randomR (-100,100) newGen'
+    newShape = simpleCircle
         { sPosition = pos
-        , sAngle = newAngle}    
+        , sGeometry = Circle newRadius
+        , sVelocity = V2 newVX newVY}   
 
 addBird :: V2 Float -> Enviornment -> Enviornment 
 addBird (V2 x y) env = env
@@ -41,3 +44,24 @@ addBird (V2 x y) env = env
     newBird = simpleTriangle 
         { sPosition = V2 (x+dx) (y+dy)
         , sAngle = newAngle}
+
+killBirds :: Enviornment -> Enviornment
+killBirds env = env { eBirds = [] }
+
+removeObsticles :: Enviornment -> Enviornment
+removeObsticles env = env { eObsticles = [] }
+
+removeShapes :: Enviornment -> Enviornment
+removeShapes env = env { eShapes = [] }
+
+scaleKSep :: Float -> Enviornment -> Enviornment 
+scaleKSep scale env = env { eKSeparation = eKSeparation env * scale}
+
+scaleKCoh :: Float -> Enviornment -> Enviornment 
+scaleKCoh scale env = env { eKCohesion = eKCohesion env * scale}
+
+scaleKAlign :: Float -> Enviornment -> Enviornment 
+scaleKAlign scale env = env { eKAlignment = eKAlignment env * scale}
+
+scaleKAvoid :: Float -> Enviornment -> Enviornment 
+scaleKAvoid scale env = env { eKAvoidance = eKAvoidance env * scale}

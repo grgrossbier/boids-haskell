@@ -30,4 +30,8 @@ Add ball on click
 ## Step 6: 
  - Shapes are repelled from obsticles.
  - Something isn't working. 
-    After applySteering do they disappear? Am I losing data/birds
+ - Stopping Notes:
+    X Scale down text.
+    Switch shape to create a ball
+    EXCEPT KSeperation - Include self in calculation
+    Dial in K constants.

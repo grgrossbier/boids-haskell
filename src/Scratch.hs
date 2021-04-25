@@ -34,3 +34,4 @@ oneShapeStep shape = head $ eShapes react
 
 runWithOutGraphics :: [Enviornment]
 runWithOutGraphics = iterate (advanceTime 0.02) newEnviornment 
+

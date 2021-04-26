@@ -9,13 +9,14 @@ import Shapes
 import Globals
 import ProjectMath
 
+-- | Draw complete enviornment. 
 enviornmentAsRunningPicture :: Enviornment -> G.Picture
 enviornmentAsRunningPicture env =
     G.pictures  [ drawShapes env
                 , G.color wallColor wallPicture
-                , G.color obsticleColor $ obsticlesOfEnviornment env
-                , G.color obsticleColor $ drawTriangles $ eObsticles env
-                , G.color triangleColor $ drawBirds $ eBirds env
+                , G.color obsticleColor $ obsticlesOfEnviornment env -- Only draws circles
+                -- , G.color obsticleColor $ drawTriangles $ eObsticles env
+                , drawBirds $ eBirds env
                 , G.color failColor $ printStats env
                 ]
 
@@ -64,8 +65,8 @@ drawTriangles shapes = G.pictures $ map pictureCircle triangles
         | isTriangle shape = (\(Triangle _ b) -> b) (sGeometry shape)
     getAngle = sAngle
     getHeightBaseAngle s = (getHeight s, getBase s, getAngle s)
-    pictureCircle shape = 
-        snapPictureToPosition (sPosition shape)
+    pictureCircle shape = G.color (sColor shape)
+        $ snapPictureToPosition (sPosition shape)
         $ uncurry3 drawTriangle (getHeightBaseAngle shape)
 
 uncurry3 :: (a -> b -> c -> d) -> (a, b, c) -> d
@@ -114,52 +115,3 @@ gameAsPicture env = G.translate (fromIntegral screenWidth * (-0.5))
 drawBirds :: [Shape] -> G.Picture 
 drawBirds shapes = 
     G.pictures [drawTriangles shapes, drawCircles shapes]
-
--- snapPictureToCell :: (Integral a, Integral b) => Picture -> (a, b) -> Picture
--- snapPictureToCell picture (row, column) = translate x y picture
---     where x = fromIntegral column * cellWidth + cellWidth * 0.5
---           y = fromIntegral row * cellHeight + cellHeight * 0.5
-
--- xCell :: Picture
--- xCell = pictures [ rotate 45.0 $ rectangleSolid side 10.0
---                  , rotate (-45.0) $ rectangleSolid side 10.0
---                  ]
---     where side = min cellWidth cellHeight * 0.75
-
--- oCell :: Picture
--- oCell = thickCircle radius 10.0
---     where radius = min cellWidth cellHeight * 0.25
-
--- cellsOfBoard :: Board -> Cell -> Picture -> Picture
--- cellsOfBoard board cell cellPicture =
---     pictures
---     $ map (snapPictureToCell cellPicture . fst)
---     $ filter (\(_, e) -> e == cell)
---     $ assocs board
-
--- xCellsOfBoard :: Board -> Picture
--- xCellsOfBoard board = cellsOfBoard board (Just PlayerX) xCell
-
--- oCellsOfBoard :: Board -> Picture
--- oCellsOfBoard board = cellsOfBoard board (Just PlayerO) oCell
-
--- boardGrid :: Picture
--- boardGrid =
---     pictures
---     $ concatMap (\i -> [ line [ (i * cellWidth, 0.0)
---                               , (i * cellWidth, fromIntegral screenHeight)
---                               ]
---                        , line [ (0.0,                      i * cellHeight)
---                               , (fromIntegral screenWidth, i * cellHeight)
---                               ]
---                        ])
---       [0.0 .. fromIntegral n]
-
--- boardAsPicture board =
---     pictures [ xCellsOfBoard board
---              , oCellsOfBoard board
---              , boardGrid
---              ]
-
--- boardAsGameOverPicture winner board = color (outcomeColor winner) (boardAsPicture board)
-

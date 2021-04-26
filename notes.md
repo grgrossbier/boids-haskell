@@ -35,3 +35,13 @@ Add ball on click
     Switch shape to create a ball
     EXCEPT KSeperation - Include self in calculation
     Dial in K constants.
+
+
+
+Math Notes: 
+- https://cs.stackexchange.com/questions/127295/algorithm-for-intersection-point-between-two-vectors
+- intersectionOfLines
+-     d1 = cross(p - a, b - a)
+-     d2 = cross(q - a, b - a)
+-     return (d1 * q - d2 * p) / (d1 - d2)
+

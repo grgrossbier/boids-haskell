@@ -10,17 +10,6 @@ import Linear.Metric
 import ProjectMath
 
 
-vectorFromAtoB :: (Float, Float) -> (Float, Float) -> (Float, Float)
-vectorFromAtoB (x, y) (x', y') = (x'-x, y'-y)
-
-vectorMagnitude :: (Float, Float) -> Float
-vectorMagnitude (x, y) = (x**2 + y**2) ** (1/2)
-
--- splitVectorIntoComponents :: Float -> (Float, Float) -> (Float, Float)
--- splitVectorIntoComponents mag (nx, ny) = ( mag * cos angle , mag * sin angle )
---   where
---     angle = (pi/2) - atan2 nx ny
-
 setAccelerationToZero :: Shape -> Shape
 setAccelerationToZero shape = shape { sAcceleration = V2 0 0 }
 

@@ -23,7 +23,6 @@ data Enviornment = Enviornment
     , eKAvoidance :: Float
     } deriving (Show)
 
-
 data Geometry = 
     Circle { getRadius :: Radius } 
     | Rectangle { getSide1 :: Side, getSide2 :: Side }
@@ -39,6 +38,7 @@ data Shape = Shape
     , sAcceleration :: V2 Float 
     , sLastPosition :: V2 Float} deriving (Show, Eq)
 
+rotateShape :: Shape -> Angle -> Shape
 rotateShape shape angle = shape { sAngle = sAngle shape + angle }
 
 isCircle :: Shape -> Bool
@@ -87,7 +87,7 @@ simpleTriangle :: Shape
 simpleTriangle = Shape 
     { sGeometry = Triangle 20 10
     , sAngle    = pi/4
-    , sColor    = obsticleColor 
+    , sColor    = triangleColor  
     , sPosition = centerOfMap
     , sVelocity = V2 50 0
     , sAcceleration = V2 0 0 
@@ -95,22 +95,3 @@ simpleTriangle = Shape
 
 degToRadian :: Float -> Angle
 degToRadian deg = deg*pi/180
-
-
-
-
-
-
-
-
-
-
-
-testBirds :: [Shape]
-testBirds = [bird1, bird2] --, bird3, bird4]
-
-bird1 = simpleTriangle { sAngle = 0, sPosition = V2 200 200 }
-bird2 = simpleTriangle { sAngle = degToRadian 10, sPosition = V2 205 200 }
-bird3 = simpleTriangle { sAngle = degToRadian 20, sPosition = V2 200 205 }
-bird4 = simpleTriangle { sAngle = degToRadian 30, sPosition = V2 205 205 }
-

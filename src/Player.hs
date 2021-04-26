@@ -13,15 +13,6 @@ import Game
 import ProjectMath
 
 
-newEnviornment = 
-    Enviornment 
-    testBirds
-    [ ] 
-    (leftWall ++ rightWall ++ topWall ++ bottomWall)
-    centerOfMap
-    (mkStdGen 10)
-    15 1 20 20
-
 window = G.InWindow "Functional" (screenWidth, screenHeight) (100, 100)
 backgroundColor = G.makeColorI 0 0 0 255
 
@@ -55,6 +46,9 @@ transformGame (EventKey (Char 'f') Down _ (mx, my)) env = scaleKAvoid 0.7 env
 transformGame (EventKey (Char 'z') Down _ (mx, my)) env = killBirds env
 transformGame (EventKey (Char 'x') Down _ (mx, my)) env = removeObsticles env
 transformGame (EventKey (Char 'c') Down _ (mx, my)) env = removeShapes env
+transformGame (EventKey (Char 'R') Down _ (mx, my)) env = let gen = eStdGen env
+                                                          in createRandomEnv gen (150,1,20)
+transformGame (EventMotion (mx, my)) env = updateMouse ((V2 mx my) + globalOffset) env
 transformGame _ env = env
 
 

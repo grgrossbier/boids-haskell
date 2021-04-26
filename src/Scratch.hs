@@ -1,3 +1,5 @@
+{-# LANGUAGE BangPatterns #-}
+
 module Scratch where
 
 import Linear.V2
@@ -32,6 +34,11 @@ oneShapeStep shape = head $ eShapes react
     updateEnv = newEnviornment { eShapes = [adv] }
     react = reactToAllWalls dt 0.99 updateEnv
 
-runWithOutGraphics :: [Enviornment]
-runWithOutGraphics = iterate (advanceTime 0.02) newEnviornment 
+runWithOutGraphics :: Int -> Enviornment -> [Enviornment]
+runWithOutGraphics i env = take i $ iterate (advanceTime 0.02) env 
 
+runThenEvalLastFrame :: Int -> Enviornment -> [V2 Float]
+runThenEvalLastFrame i env = lastBirdPos
+  where
+    lastState = last $ runWithOutGraphics i env
+    !lastBirdPos = map (sPosition) $ eBirds lastState

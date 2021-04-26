@@ -8,6 +8,15 @@ import qualified Graphics.Gloss as G
 import Globals
 import ProjectMath
 
+newEnviornment :: Enviornment
+newEnviornment = Enviornment 
+    testBirds
+    [ ] 
+    (leftWall ++ rightWall ++ topWall ++ bottomWall)
+    (centerCircle {sPosition = V2 (-20) (-20)})
+    centerOfMap
+    (mkStdGen 10)
+    15 1 20 35
 
 -- | Add Obsticle at location. Circle with random velocity and radius.
 addObsticle :: V2 Float -> Enviornment -> Enviornment 
@@ -59,6 +68,13 @@ addBird (V2 x y) env = env
         , sAngle = newAngle
         , sColor = G.makeColorI rRGB gRGB bRGB 255}
 
+-- <><><><><><><><><><>  Update Mouse Position  <><><><><><><><><><> --
+
+updateMouse :: V2 Float -> Enviornment -> Enviornment 
+updateMouse pos env = env { eMouse = newMouse }
+  where
+    wasMouse = eMouse env
+    newMouse = wasMouse { sPosition = pos }
 
 -- <><><><><><><><><><>  Empty Env Buckets  <><><><><><><><><><> --
 
@@ -136,4 +152,26 @@ bird3 :: Shape
 bird3 = simpleTriangle { sAngle = degToRadian 20, sPosition = V2 200 205 }
 bird4 :: Shape
 bird4 = simpleTriangle { sAngle = degToRadian 30, sPosition = V2 205 205 }
+
+-- <><><><><><><><><><>  Random Env  <><><><><><><><><><> --
+
+createRandomEnv :: StdGen -> (Int,Int,Int) -> Enviornment 
+createRandomEnv gen (numB, numS, numO) = addedObsticles
+  where
+    startEnv = newEnviornment { eStdGen = gen }
+    addedBirds = addRandomXs addBird numB startEnv
+    addedShapes = addRandomXs addShape numS addedBirds
+    addedObsticles = addRandomXs addObsticle numO addedShapes
+
+addRandomXs :: (V2 Float -> Enviornment -> Enviornment) -> Int -> Enviornment -> Enviornment 
+addRandomXs f i env
+    | i <= 0 = env
+    | otherwise = last $ take i $ iterate (addRandomX f) env
+
+addRandomX :: (V2 Float -> Enviornment -> Enviornment) -> Enviornment -> Enviornment 
+addRandomX f env = f (V2 pX pY) $ env {eStdGen = newGen'}
+  where
+    gen = eStdGen env
+    (pX, newGen) = randomR (15,fromIntegral screenWidth -15) gen
+    (pY, newGen') = randomR (15,fromIntegral screenHeight -15) newGen
 

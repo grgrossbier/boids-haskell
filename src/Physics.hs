@@ -171,7 +171,7 @@ applySteeringToBirds env = env { eBirds = appliedAvoidance }
     appliedSeperation = applyToEachInFlock False (1.5 * effectiveRadius simpleTriangle) (applySeperation kSep) birds
     appliedAlignment = applyToEachInFlock True (maxDist/2) (applyAlignment kAlign) appliedSeperation
     appliedCohesion = applyToEachInFlock True maxDist (applyCohesion kCoh) appliedAlignment
-    appliedAvoidance = map (applyAvoidance 30 kAvoid env) appliedCohesion
+    appliedAvoidance = map (applyAvoidance 17 kAvoid env) appliedCohesion
 
 applySeperation :: Float -> [Shape] -> Shape -> Shape
 applySeperation k others target
@@ -228,7 +228,7 @@ applyAvoidance thresh k env target
     | null allObst = target
     | otherwise = target { sAngle = limitAngle newAngle }
   where
-    allObst = eShapes env ++ eObsticles env
+    allObst = eMouse env : (eShapes env ++ eObsticles env)
     pushVectors = 
         map (getPushVector target) 
         . filter (obsticleIsCloseEnough thresh target) 

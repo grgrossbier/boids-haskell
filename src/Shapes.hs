@@ -15,6 +15,7 @@ data Enviornment = Enviornment
     { eBirds :: [Shape]
     , eShapes :: [Shape]
     , eObsticles :: [Shape]
+    , eMouse :: Shape
     , eCenter :: V2 Float
     , eStdGen :: StdGen
     , eKSeparation :: Float
@@ -75,7 +76,7 @@ testShape = simpleCircle { sPosition = V2 0 0
 
 centerCircle :: Shape
 centerCircle = Shape 
-    { sGeometry = Circle 6
+    { sGeometry = Circle 10
     , sAngle    = 0
     , sColor    = obsticleColor 
     , sPosition = centerOfMap

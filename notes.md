@@ -36,6 +36,10 @@ Add ball on click
     EXCEPT KSeperation - Include self in calculation
     Dial in K constants.
 
+## Step 7:
+ - Make Parallel
+ - Benchmarking
+
 
 
 Math Notes: 
